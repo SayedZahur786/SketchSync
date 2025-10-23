@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Collaborative whiteboard</title>
+
+    <!-- Prevent flash of wrong theme -->
+    <script>
+      // Apply dark mode class before page renders - default to light mode
+      (function () {
+        const savedTheme = localStorage.getItem("sketchsync_dark_mode");
+        if (savedTheme !== null) {
+          const isDark = JSON.parse(savedTheme);
+          if (isDark) {
+            document.documentElement.classList.add("dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+          }
+        } else {
+          // Default to light mode
+          document.documentElement.classList.remove("dark");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
