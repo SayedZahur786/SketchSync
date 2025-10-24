@@ -102,9 +102,14 @@ export const login = async (req, res) => {
       });
     }
 
-    // Update last login
-    user.lastLogin = Date.now();
-    await user.save();
+    // Update last login using MongoDB native to avoid schema issues
+    await User.collection.updateOne(
+      { _id: user._id },
+      { $set: { lastLogin: new Date() } }
+    );
+
+    // Get user data using MongoDB native driver to bypass Mongoose schema validation
+    const userDoc = await User.collection.findOne({ _id: user._id });
 
     // Generate token
     const token = generateToken(user._id);
@@ -119,7 +124,7 @@ export const login = async (req, res) => {
         email: user.email,
         avatar: user.avatar,
         isGuest: false,
-        rooms: user.rooms || []
+        rooms: userDoc.rooms || []
       }
     });
   } catch (error) {
