@@ -15,11 +15,26 @@ ConnectionDB();
 const app = express();
 const server = http.createServer(app);
 
-// CORS configuration
+// CORS configuration - Support multiple frontend URLs
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
+  : ['*'];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || '*',
-  methods: ['GET', 'POST'],
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if the origin is in the allowed origins list
+    if (allowedOrigins.includes('*') || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 const io = new Server(server, {
